@@ -8,6 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 # Pass in the directory as arguments e.g. 'Homework 2/'
 ROOT_DIR = os.path.abspath(sys.argv[1])
 xv6_path = os.path.join(ROOT_DIR, 'xv6-public')
+student = sys.argv[2] if len(sys.argv) > 2 else None
 
 def setup_student(student):
     print(f"+ Begin Student {student} Setup")
@@ -43,7 +44,8 @@ def setup():
     shutil.rmtree(xv6_path)
 
 def evaluate(student=None):
-    students = os.listdir(ROOT_DIR) if not student else list(student)
+    students = os.listdir(ROOT_DIR) if not student else [student, ]
+    print(students)
     for student in students:
         os.chdir(os.path.join(ROOT_DIR, student, 'xv6-public'))
         input(f"+ Press Enter to Evaluating The Next Student {student}")
@@ -55,4 +57,4 @@ def evaluate(student=None):
 
 if __name__ == "__main__":
     setup()
-    evaluate()
+    evaluate(student=student)
