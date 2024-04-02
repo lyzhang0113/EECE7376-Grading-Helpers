@@ -3,30 +3,40 @@ import sys
 import subprocess
 from organize import organize_by_student_name
 
-def compile_c_files(root_dir):
+def compile_file(root, file):
+    # Generate Paths for the files
+    src = os.path.join(root, file)
+    # Remove the '.c' extension for the output file
+    dst = os.path.join(root, os.path.splitext(file)[0])
+
+    # Compile using gcc
+    subprocess.run(['gcc', src, '-o', dst], check=True)
+
+    # Execution
+    subprocess.run("./" + dst)
+    os.remove(dst) # Cleanup
+
+def evaluate_file(executable):
+    subprocess.run("./" + executable)
+    os.remove(executable) # Cleanup
+
+def main(root_dir):
     for root, dirs, files in os.walk(root_dir):
         for file in files:
             if file.endswith('.c'):
-                full_path = os.path.join(root, file)
-                # Remove the '.c' extension for the output file
-                output_file = os.path.join(root, os.path.splitext(file)[0])
-                # File for compiler warnings and errors
-                error_file = os.path.join(root, os.path.splitext(file)[0] + '_errors.txt')
-                
-                # Compile the C file
-                with open(error_file, 'w') as ef:
+                student = os.path.basename(os.path.dirname(os.path.join(root, file)))
+                # Compile this file
+                input(f"Press Enter to Compile and Evaluate {student} {file}")
+                while True:
                     try:
-                        subprocess.run(['gcc', full_path, '-o', output_file], 
-                                       stderr=ef, 
-                                       check=True)
-                        print(f"Compiled: {full_path} to {output_file}")
-                    except subprocess.CalledProcessError as e:
-                        print(f"Failed to compile {full_path}, see {error_file} for details")
+                        dst = compile_file(root, file)
+                    except subprocess.CalledProcessError:
+                        if input(f"Failed! Re-compile {student} {file}? [y/N]") == 'y':
+                            continue
+                        print(f"Skipping Evaluation of {student} {file} due to unsuccessful compilation")
+                    break
 
-                # Delete the error file if it is empty
-                if os.path.getsize(error_file) == 0:
-                    os.remove(error_file)
 
 if __name__ == "__main__":
     # Pass in the directory as arguments e.g. 'Homework 2/'
-    compile_c_files(sys.argv[1])
+    main(sys.argv[1])
