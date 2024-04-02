@@ -1,7 +1,6 @@
 import os
 import sys
 import subprocess
-from organize import organize_by_student_name
 
 def compile_file(root, file):
     # Generate Paths for the files
